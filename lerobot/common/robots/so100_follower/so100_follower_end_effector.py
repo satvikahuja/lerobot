@@ -55,6 +55,8 @@ class SO100FollowerEndEffector(SO100Follower):
                 "wrist_flex": Motor(4, "sts3215", MotorNormMode.DEGREES),
                 "wrist_roll": Motor(5, "sts3215", MotorNormMode.DEGREES),
                 "gripper": Motor(6, "sts3215", MotorNormMode.RANGE_0_100),
+                "extra_wrist": Motor(7, "sts3215", MotorNormMode.DEGREES),
+
             },
             calibration=self.calibration,
         )
