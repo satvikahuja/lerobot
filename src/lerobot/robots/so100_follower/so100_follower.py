@@ -19,10 +19,10 @@ import time
 from functools import cached_property
 from typing import Any
 
-from lerobot.cameras.utils import make_cameras_from_configs
-from lerobot.errors import DeviceAlreadyConnectedError, DeviceNotConnectedError
-from lerobot.motors import Motor, MotorCalibration, MotorNormMode
-from lerobot.motors.feetech import (
+from lerobot.common.cameras.utils import make_cameras_from_configs
+from lerobot.common.errors import DeviceAlreadyConnectedError, DeviceNotConnectedError
+from lerobot.common.motors import Motor, MotorCalibration, MotorNormMode
+from lerobot.common.motors.feetech import (
     FeetechMotorsBus,
     OperatingMode,
 )
@@ -55,8 +55,7 @@ class SO100Follower(Robot):
                 "wrist_flex": Motor(4, "sts3215", norm_mode_body),
                 "wrist_roll": Motor(5, "sts3215", norm_mode_body),
                 "gripper": Motor(6, "sts3215", MotorNormMode.RANGE_0_100),
-                "wrist_roll": Motor(7, "sts3215", norm_mode_body),
-
+                "extra_wrist": Motor(7, "sts3215", norm_mode_body),
             },
             calibration=self.calibration,
         )
@@ -64,7 +63,15 @@ class SO100Follower(Robot):
 
     @property
     def _motors_ft(self) -> dict[str, type]:
-        return {f"{motor}.pos": float for motor in self.bus.motors}
+        motors = {f"{motor}.pos": float for motor in self.bus.motors}
+        # Add bounding box coordinates to robot state
+        motors.update({
+            "bbox.x1": float, 
+            "bbox.y1": float,
+            "bbox.x2": float, 
+            "bbox.y2": float
+        })
+        return motors
 
     @property
     def _cameras_ft(self) -> dict[str, tuple]:
@@ -166,6 +173,14 @@ class SO100Follower(Robot):
         obs_dict = {f"{motor}.pos": val for motor, val in obs_dict.items()}
         dt_ms = (time.perf_counter() - start) * 1e3
         logger.debug(f"{self} read state: {dt_ms:.1f}ms")
+
+        # Add bounding box coordinates (dummy values for now)
+        obs_dict.update({
+            "bbox.x1": 0.0,  # Replace with actual detection later
+            "bbox.y1": 0.0,
+            "bbox.x2": 1.0, 
+            "bbox.y2": 1.0
+        })
 
         # Capture images from cameras
         for cam_key, cam in self.cameras.items():
