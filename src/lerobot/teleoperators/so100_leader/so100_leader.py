@@ -50,6 +50,8 @@ class SO100Leader(Teleoperator):
                 "wrist_flex": Motor(4, "sts3215", MotorNormMode.RANGE_M100_100),
                 "wrist_roll": Motor(5, "sts3215", MotorNormMode.RANGE_M100_100),
                 "gripper": Motor(6, "sts3215", MotorNormMode.RANGE_0_100),
+                 "wrist_roll": Motor(7, "sts3215", MotorNormMode.RANGE_M100_100),
+
             },
             calibration=self.calibration,
         )
